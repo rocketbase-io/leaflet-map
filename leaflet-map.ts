@@ -12,12 +12,6 @@ import * as L from 'leaflet';
 
 import MAP_STYLES from './leaflet-map.css';
 
-/**
- * Best guess, assuming `leaflet-element` is installed alongside `leaflet` in `node_modules`
- */
-const NODE_MODULES_LEAFLET_IMAGE_PATH =
-  new URL('../../node_modules/leaflet/dist/images/', import.meta.url).pathname;
-
 interface FeatureElement extends LeafletBase {
   feature: L.LayerGroup | L.Polyline | L.Polygon | L.Marker;
   layer: L.LayerGroup | L.Layer;
@@ -361,7 +355,7 @@ export class LeafletMap extends LeafletBase {
       L.Icon.Default.imagePath ||
       // fallback to default assets path,
       // assumes that `leaflet-element` is a sibling of `leaflet`, i.e. in `/node_modules`.
-      NODE_MODULES_LEAFLET_IMAGE_PATH
+      '../../node_modules/leaflet/dist/images/'
     );
   }
 
