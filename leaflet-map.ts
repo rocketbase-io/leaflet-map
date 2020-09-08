@@ -11,6 +11,7 @@ import ResizeObserver from 'resize-observer-polyfill';
 import * as L from 'leaflet';
 
 import MAP_STYLES from './leaflet-map.css';
+import LEAFLET_STYLES from 'leaflet/dist/leaflet.css';
 
 interface FeatureElement extends LeafletBase {
   feature: L.LayerGroup | L.Polyline | L.Polygon | L.Marker;
@@ -214,6 +215,8 @@ export class LeafletMap extends LeafletBase {
     'locationerror',
     'popupopen',
     'popupclose',
+    'vaadinaftermove',
+    'vaadinafterzoom',
   ].join(' ');
 
 
@@ -353,9 +356,8 @@ export class LeafletMap extends LeafletBase {
       this.__imagePath ||
       // Let user override the assets path globally
       L.Icon.Default.imagePath ||
-      // fallback to default assets path,
-      // assumes that `leaflet-element` is a sibling of `leaflet`, i.e. in `/node_modules`.
-      '../../node_modules/leaflet/dist/images/'
+      // fallback to default assets path
+      '/leaflet/dist/images/'
     );
   }
 
@@ -419,9 +421,8 @@ export class LeafletMap extends LeafletBase {
   }
 
   render(): TemplateResult {
-    const url = `${this.imagePath}../leaflet.css`;
     return html`
-      <link rel="stylesheet" href="${url}"></link>
+      <link rel="stylesheet" href="${LEAFLET_STYLES}"></link>
       <div id="map"></div>
       <slot id="markers"></slot>
     `;
@@ -564,10 +565,13 @@ export class LeafletMap extends LeafletBase {
     this.latitude = this.map.getCenter().lat;
     await this.updateComplete;
     this._ignoreViewChange = false;
+    this.fire('vaadinaftermove');
   }
 
-  @bound private onZoomend() {
+  @bound private async onZoomend() {
     this.zoom = this.map.getZoom();
+    await this.updateComplete;
+    this.fire('vaadinafterzoom');
   }
 
   @bound private async onIntersection(records: IntersectionObserverEntry[]) {
